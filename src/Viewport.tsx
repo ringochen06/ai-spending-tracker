@@ -1,15 +1,15 @@
+import React, { useState, useEffect } from "react";
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
-import "./Viewport.css";
 import HomePage from "./pages/HomePage";
 import AboutPage from "./pages/AboutPage";
 import TermsAndConditionsPage from "./pages/TermsAndConditionsPage";
-import React from "react";
-import Paper from "@mui/material/Paper";
-import BottomNavigation from "@mui/material/BottomNavigation";
-import BottomNavigationAction from "@mui/material/BottomNavigationAction";
-import HomeIcon from "@mui/icons-material/Home";
-import InfoIcon from "@mui/icons-material/Info";
-import DescriptionIcon from "@mui/icons-material/Description";
+import { Paper, BottomNavigation, BottomNavigationAction } from "@mui/material";
+import {
+  Home as HomeIcon,
+  Info as InfoIcon,
+  Description as DescriptionIcon,
+} from "@mui/icons-material";
+import "./Viewport.css";
 
 const pathToValueMap: Record<string, number> = {
   "/": 0,
@@ -28,12 +28,10 @@ function Viewport() {
   const location = useLocation();
 
   // Set initial value based on the current path, defaulting to 0 (Home)
-  const [value, setValue] = React.useState(
-    pathToValueMap[location.pathname] ?? 0
-  );
+  const [value, setValue] = useState(pathToValueMap[location.pathname] ?? 0);
 
   // Effect to update BottomNavigation value if the route changes (e.g., browser back/forward)
-  React.useEffect(() => {
+  useEffect(() => {
     setValue(pathToValueMap[location.pathname] ?? 0);
   }, [location.pathname]);
 
@@ -62,7 +60,7 @@ function Viewport() {
       {/* Use Paper component for background, shadow, and fixed positioning */}
       <Paper
         sx={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 1000 }}
-        elevation={3}
+        elevation={10}
       >
         <BottomNavigation
           showLabels
