@@ -45,6 +45,7 @@ function Viewport() {
 
   return (
     <>
+      {/* Main Content */}
       <main className="main-content">
         <Routes>
           <Route path="/" element={<HomePage />} />
@@ -57,7 +58,8 @@ function Viewport() {
           <Route path="/terms" element={<TermsAndConditionsPage />} />
         </Routes>
       </main>
-      {/* Use Paper component for background, shadow, and fixed positioning */}
+
+      {/* Botton Nav Bar */}
       <Paper
         sx={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 1000 }}
         elevation={10}
