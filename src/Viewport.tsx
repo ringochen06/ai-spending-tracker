@@ -1,10 +1,10 @@
 import { Routes, Route, Link } from 'react-router-dom'
-import './App.css'
+import './Viewport.css'
 import HomePage from './pages/HomePage';
 import AboutPage from './pages/AboutPage';
 import TermsAndConditionsPage from './pages/TermsAndConditionsPage';
 
-function App() {
+function Viewport() {
   return (
     <>
       <nav style={{ marginBottom: 20 }}>
@@ -19,4 +19,4 @@ function App() {
   )
 }
 
-export default App
+export default Viewport
