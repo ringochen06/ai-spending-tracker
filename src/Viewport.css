@@ -40,3 +40,11 @@
 .read-the-docs {
   color: #888;
 }
+
+.main-content {
+  /* Add padding to the bottom of the main content area */
+  /* This prevents the fixed bottom nav from overlapping the page content. */
+  /* The MUI BottomNavigation is typically 56px high. */
+  /* Adjust this value if your BottomNavigation height is different. */
+  padding-bottom: 70px; /* Increased slightly for good measure */
+}

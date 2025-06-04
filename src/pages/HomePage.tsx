@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import reactLogo from '../assets/react.svg' // Adjusted path
 import viteLogo from '/vite.svg' // Absolute path, no change needed
-import '../App.css' // Adjusted path
+import '../Viewport.css' // Adjusted path
 
 function HomePage() {
   const [count, setCount] = useState(0)
