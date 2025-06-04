@@ -1,29 +1,29 @@
 import React, { useState, useEffect } from "react";
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import HomePage from "./pages/HomePage";
-import AboutPage from "./pages/AboutPage";
-import TermsAndConditionsPage from "./pages/TermsAndConditionsPage";
+import TransactionPage from "./pages/TransactionPage"; // Updated import
+import AddSpendingPage from "./pages/AddSpendingPage"; // Updated import
 import { Paper, BottomNavigation, BottomNavigationAction } from "@mui/material";
 import {
   Home as HomeIcon,
-  Info as InfoIcon,
-  Description as DescriptionIcon,
+  ReceiptLong as ReceiptLongIcon, // Updated icon
+  AddCircleOutline as AddCircleOutlineIcon, // Updated icon
 } from "@mui/icons-material";
 import "./Viewport.css";
 
 const pathToValueMap: Record<string, number> = {
   "/": 0,
-  "/about": 1,
-  "/terms": 2,
+  "/transactions": 1, // Updated path
+  "/add-spending": 2, // Updated path
 };
 
 const valueToPathMap: Record<number, string> = {
   0: "/",
-  1: "/about",
-  2: "/terms",
+  1: "/transactions", // Updated path
+  2: "/add-spending", // Updated path
 };
 
-function Viewport() {
+const Viewport = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -49,13 +49,8 @@ function Viewport() {
       <main className="main-content">
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route
-            path="/about"
-            element={
-              <AboutPage textContent="This is the dynamic about page content passed as a prop!" />
-            }
-          />
-          <Route path="/terms" element={<TermsAndConditionsPage />} />
+          <Route path="/transactions" element={<TransactionPage />} />
+          <Route path="/add-spending" element={<AddSpendingPage />} />
         </Routes>
       </main>
 
@@ -70,12 +65,18 @@ function Viewport() {
           onChange={handleNavigationChange}
         >
           <BottomNavigationAction label="Home" icon={<HomeIcon />} />
-          <BottomNavigationAction label="About" icon={<InfoIcon />} />
-          <BottomNavigationAction label="Terms" icon={<DescriptionIcon />} />
+          <BottomNavigationAction
+            label="Transactions"
+            icon={<ReceiptLongIcon />}
+          />
+          <BottomNavigationAction
+            label="Add Spending"
+            icon={<AddCircleOutlineIcon />}
+          />
         </BottomNavigation>
       </Paper>
     </>
   );
-}
+};
 
 export default Viewport;
