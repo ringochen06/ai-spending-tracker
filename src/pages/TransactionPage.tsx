@@ -1,12 +1,11 @@
-import CoffeeIconMUI from "@mui/icons-material/Coffee"; // Renamed to avoid conflict if custom CoffeeIcon was global
+import CoffeeIconMUI from "@mui/icons-material/Coffee";
 import ShoppingCartIconMUI from "@mui/icons-material/ShoppingCart";
 import LocalPizzaIcon from "@mui/icons-material/LocalPizza";
-import DirectionsTransitIcon from "@mui/icons-material/DirectionsTransit"; // Or TrainIcon
-import ConfirmationNumberIcon from "@mui/icons-material/ConfirmationNumber"; // Replacement for TicketIcon
-import CheckroomIcon from "@mui/icons-material/Checkroom"; // Replacement for ShirtIcon
+import DirectionsTransitIcon from "@mui/icons-material/DirectionsTransit";
+import ConfirmationNumberIcon from "@mui/icons-material/ConfirmationNumber";
+import CheckroomIcon from "@mui/icons-material/Checkroom";
 import TransactionDetail from "../atoms/TransactionDetail";
 
-// --- Mock Data ---
 const mockData = [
   {
     id: 1,
@@ -59,8 +58,12 @@ const mockData = [
 ];
 
 const TransactionPage = () => {
+  const totalAmount = mockData.reduce((sum, item) => sum + item.amount, 0);
+
   return (
     <>
+      <h2>Total Spending: ${totalAmount.toFixed(2)}</h2>
+
       <h2>Transactions</h2>
       {mockData.map((transaction) => (
         <TransactionDetail
@@ -75,4 +78,5 @@ const TransactionPage = () => {
     </>
   );
 };
+
 export default TransactionPage;
