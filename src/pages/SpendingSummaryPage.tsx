@@ -39,7 +39,7 @@ const SpendingSummaryPage: React.FC<SpendingSummaryProps> = () => {
     // This is where you would trigger a data refetch based on the selected tab.
   }, [tabValue]);
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
 

@@ -40,7 +40,7 @@ const Viewport = () => {
   }, [location.pathname]);
 
   const handleNavigationChange = (
-    event: React.SyntheticEvent,
+    _event: React.SyntheticEvent,
     newValue: number
   ) => {
     setValue(newValue);

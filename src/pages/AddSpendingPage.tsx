@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import Webcam from "react-webcam";
 import styles from "./AddSpendingPage.module.css"; // Import the CSS module
-import { type User, onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../firebase";
 
 const AddSpendingPage = () => {
@@ -18,9 +18,7 @@ const AddSpendingPage = () => {
   const [category, setCategory] = useState("");
   const [amount, setAmount] = useState("");
   const [additionalInfo, setAdditionalInfo] = useState("");
-  const [user, setUser] = useState<User | null>(null);
   const [authenticated, setIsAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true);
 
   // Webcam related state
   const videoConstraints = {
@@ -87,7 +85,7 @@ const AddSpendingPage = () => {
   }, [uploadMode]);
 
   const handleUploadModeChange = (
-    event: React.MouseEvent<HTMLElement>,
+    _event: React.MouseEvent<HTMLElement>,
     newMode: "manual" | "camera" | null
   ) => {
     if (newMode !== null) {
@@ -98,7 +96,6 @@ const AddSpendingPage = () => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
       if (currentUser) {
         setIsAuthenticated(true);
       }
