@@ -19,6 +19,7 @@ const AddSpendingPage = () => {
   const [amount, setAmount] = useState("");
   const [additionalInfo, setAdditionalInfo] = useState("");
   const [user, setUser] = useState<User | null>(null);
+  const [authenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
 
   // Webcam related state
@@ -99,17 +100,13 @@ const AddSpendingPage = () => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       if (currentUser) {
-        console.log("User is logged in on AddSpendingPage:", currentUser.uid);
-        console.log(currentUser);
-        setLoading(false);
-      } else {
-        console.log("No user logged in on AddSpendingPage.");
+        setIsAuthenticated(true);
       }
     });
     return () => unsubscribe();
   }, []);
 
-  if (loading) {
+  if (!authenticated) {
     return <p>Please login to view this page</p>;
   }
 

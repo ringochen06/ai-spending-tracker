@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../firebase";
 import {
   Tabs,
   Tab,
@@ -17,13 +19,17 @@ interface SpendingSummaryProps {
 
 const SpendingSummaryPage: React.FC<SpendingSummaryProps> = () => {
   const [tabValue, setTabValue] = useState(0); // 0: Daily, 1: Weekly, 2: Monthly
+  const [authenticated, setIsAuthenticated] = useState(false);
 
   // 1. useEffect that runs once on component startup (mount)
   useEffect(() => {
-    console.log(
-      "SpendingSummaryPage has mounted. Fetching initial summary data..."
-    );
-    // This is a good place to fetch data for the default tab (e.g., Daily)
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        setIsAuthenticated(true);
+      }
+    });
+
+    return () => unsubscribe();
   }, []);
 
   // 2. useEffect that runs whenever the `tabValue` state changes
@@ -47,6 +53,10 @@ const SpendingSummaryPage: React.FC<SpendingSummaryProps> = () => {
 
   const insightsAndSuggestions =
     "Your spending is higher than average in the 'Food & Dining' category this month. Consider reducing eating out expenses.";
+
+  if (!authenticated) {
+    return <p>Please login to view this page</p>;
+  }
 
   return (
     <div className={styles.container}>
