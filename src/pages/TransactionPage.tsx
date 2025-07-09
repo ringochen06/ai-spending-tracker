@@ -1,23 +1,25 @@
 import { useState, useEffect, useMemo } from "react";
-import CoffeeIconMUI from "@mui/icons-material/Coffee"; // Renamed to avoid conflict if custom CoffeeIcon was global
-import ShoppingCartIconMUI from "@mui/icons-material/ShoppingCart";
-import LocalPizzaIcon from "@mui/icons-material/LocalPizza";
-import DirectionsTransitIcon from "@mui/icons-material/DirectionsTransit"; // Or TrainIcon
-import ConfirmationNumberIcon from "@mui/icons-material/ConfirmationNumber"; // Replacement for TicketIcon
-import CheckroomIcon from "@mui/icons-material/Checkroom"; // Replacement for ShirtIcon
+import RestaurantIcon from "@mui/icons-material/Restaurant";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
+import FitnessCenterIcon from "@mui/icons-material/FitnessCenter";
+import TheatersIcon from "@mui/icons-material/Theaters";
+import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
+import FlightIcon from "@mui/icons-material/Flight";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import {
   TextField,
   Select,
   MenuItem,
   FormControl,
   InputLabel,
-  Box,
   type SelectChangeEvent,
 } from "@mui/material";
 import TransactionDetail from "../atoms/TransactionDetail";
-import { type User, onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../firebase";
 import styles from "./TransactionPage.module.css";
+import { getTransactions } from "../api/api";
 
 // --- Define a type for our transaction data ---
 interface Transaction {
@@ -29,61 +31,32 @@ interface Transaction {
   date: string;
 }
 
-// --- Mock Data ---
-const mockData: Transaction[] = [
-  {
-    id: 1,
-    icon: <CoffeeIconMUI />,
-    name: "Cafe Mocha",
-    category: "Coffee",
-    amount: 4.5,
-    date: "2024-05-30",
-  },
-  {
-    id: 2,
-    icon: <ShoppingCartIconMUI />,
-    name: "Supermart",
-    category: "Groceries",
-    amount: 75.2,
-    date: "2024-05-30",
-  },
-  {
-    id: 3,
-    icon: <LocalPizzaIcon />,
-    name: "Pizza Palace",
-    category: "Dining",
-    amount: 25.0,
-    date: "2024-05-29",
-  },
-  {
-    id: 4,
-    icon: <DirectionsTransitIcon />,
-    name: "Metro Fare",
-    category: "Transportation",
-    amount: 2.75,
-    date: "2024-05-29",
-  },
-  {
-    id: 5,
-    icon: <ConfirmationNumberIcon />,
-    name: "Cinema Tickets",
-    category: "Entertainment",
-    amount: 30.0,
-    date: "2024-05-28",
-  },
-  {
-    id: 6,
-    icon: <CheckroomIcon />,
-    name: "Clothing Store",
-    category: "Shopping",
-    amount: 120.0,
-    date: "2024-05-27",
-  },
-];
+const getIconForCategory = (category: string): React.ReactNode => {
+  switch (category) {
+    case "Food & Dining":
+      return <RestaurantIcon />;
+    case "Shopping":
+      return <ShoppingCartIcon />;
+    case "Transportation":
+      return <DirectionsCarIcon />;
+    case "Health & Fitness":
+      return <FitnessCenterIcon />;
+    case "Entertainment":
+      return <TheatersIcon />;
+    case "Utilities":
+      return <ReceiptLongIcon />;
+    case "Travel":
+      return <FlightIcon />;
+    case "Other":
+      return <MoreHorizIcon />;
+    default:
+      // Return a default icon for any unhandled cases
+      return <MoreHorizIcon />;
+  }
+};
 
 const TransactionPage = () => {
-    const [user, setUser] = useState<User | null>(null);
-    const [loading, setLoading] = useState(true);
+  const [authenticated, setIsAuthenticated] = useState(false);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isDataLoaded, setIsDataLoaded] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -91,26 +64,35 @@ const TransactionPage = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("");
 
   useEffect(() => {
-      const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-        setUser(currentUser);
-        if (currentUser) {
-          console.log("User is logged in on TransactionPage:", currentUser.uid);
-          setLoading(false);
-        } else {
-          console.log("No user logged in on TransactionPage.");
-        }
-      });
-      return () => unsubscribe();
-    }, []);
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        setIsAuthenticated(true);
+        const fetchAndSetTransactions = async () => {
+          try {
+            const apiData = await getTransactions();
 
-  useEffect(() => {
-    // Simulate fetching data
-    const timerId = setTimeout(() => {
-      setTransactions(mockData);
-      setIsDataLoaded(true);
-    }, 1000);
+            const mappedTransactions: Transaction[] = apiData.map(
+              (item: any) => ({
+                id: item.id,
+                name: item.merchantName,
+                category: item.category,
+                amount: item.amount,
+                date: new Date(item.date).toLocaleDateString(),
+                icon: getIconForCategory(item.category),
+              })
+            );
+            setTransactions(mappedTransactions);
+            setIsDataLoaded(true);
+          } catch (error) {
+            console.error("Failed to fetch transactions:", error);
+          }
+        };
 
-    return () => clearTimeout(timerId); // Cleanup timeout on component unmount
+        fetchAndSetTransactions();
+      }
+    });
+
+    return () => unsubscribe();
   }, []);
 
   const uniqueDates = useMemo(() => {
@@ -140,8 +122,8 @@ const TransactionPage = () => {
     });
   }, [transactions, searchTerm, selectedDate, selectedCategory]);
 
-  if (loading) {
-      return <p>Please login to view this page</p>;
+  if (!authenticated) {
+    return <p>Please login to view this page</p>;
   }
 
   return (
