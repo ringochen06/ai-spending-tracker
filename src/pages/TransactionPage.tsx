@@ -1,13 +1,4 @@
 import { useState, useEffect, useMemo } from "react";
-<<<<<<< HEAD
-import CoffeeIconMUI from "@mui/icons-material/Coffee"; // Renamed to avoid conflict if custom CoffeeIcon was global
-import ShoppingCartIconMUI from "@mui/icons-material/ShoppingCart";
-import LocalPizzaIcon from "@mui/icons-material/LocalPizza";
-import DirectionsTransitIcon from "@mui/icons-material/DirectionsTransit"; // Or TrainIcon
-import ConfirmationNumberIcon from "@mui/icons-material/ConfirmationNumber"; // Replacement for TicketIcon
-import CheckroomIcon from "@mui/icons-material/Checkroom"; // Replacement for ShirtIcon
-
-=======
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
@@ -16,13 +7,15 @@ import TheatersIcon from "@mui/icons-material/Theaters";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import FlightIcon from "@mui/icons-material/Flight";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
->>>>>>> upstream/feature/spending-summary-page
 import {
   TextField,
   Select,
   MenuItem,
   FormControl,
   InputLabel,
+  CircularProgress,
+  Box,
+  Typography,
   type SelectChangeEvent,
 } from "@mui/material";
 
@@ -32,7 +25,6 @@ import { auth } from "../firebase";
 import styles from "./TransactionPage.module.css";
 import { getTransactions } from "../api/api";
 
-// --- Define a type for our transaction data ---
 interface Transaction {
   id: number;
   icon: React.ReactNode;
@@ -42,65 +34,6 @@ interface Transaction {
   date: string;
 }
 
-<<<<<<< HEAD
-
-const mockData: Transaction[] = [
-
-  {
-    id: 1,
-    icon: <CoffeeIconMUI />,
-    name: "Cafe Mocha",
-    category: "Coffee",
-    amount: 4.5,
-    date: "2024-05-30",
-  },
-  {
-    id: 2,
-    icon: <ShoppingCartIconMUI />,
-    name: "Supermart",
-    category: "Groceries",
-    amount: 75.2,
-    date: "2024-05-30",
-  },
-  {
-    id: 3,
-    icon: <LocalPizzaIcon />,
-    name: "Pizza Palace",
-    category: "Dining",
-    amount: 25.0,
-    date: "2024-05-29",
-  },
-  {
-    id: 4,
-    icon: <DirectionsTransitIcon />,
-    name: "Metro Fare",
-    category: "Transportation",
-    amount: 2.75,
-    date: "2024-05-29",
-  },
-  {
-    id: 5,
-    icon: <ConfirmationNumberIcon />,
-    name: "Cinema Tickets",
-    category: "Entertainment",
-    amount: 30.0,
-    date: "2024-05-28",
-  },
-  {
-    id: 6,
-    icon: <CheckroomIcon />,
-    name: "Clothing Store",
-    category: "Shopping",
-    amount: 120.0,
-    date: "2024-05-27",
-  },
-];
-
-const TransactionPage = () => {
-  
-    const [user, setUser] = useState<User | null>(null);
-    const [loading, setLoading] = useState(true);
-=======
 const getIconForCategory = (category: string): React.ReactNode => {
   switch (category) {
     case "Food & Dining":
@@ -120,16 +53,32 @@ const getIconForCategory = (category: string): React.ReactNode => {
     case "Other":
       return <MoreHorizIcon />;
     default:
-      // Return a default icon for any unhandled cases
       return <MoreHorizIcon />;
   }
 };
 
+// Loading Component
+const LoadingSpinner = ({ message = "Loading..." }: { message?: string }) => (
+  <Box 
+    display="flex" 
+    flexDirection="column" 
+    alignItems="center" 
+    justifyContent="center" 
+    minHeight="200px"
+    gap={2}
+  >
+    <CircularProgress />
+    <Typography variant="body2" color="text.secondary">
+      {message}
+    </Typography>
+  </Box>
+);
+
 const TransactionPage = () => {
   const [authenticated, setIsAuthenticated] = useState(false);
->>>>>>> upstream/feature/spending-summary-page
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isDataLoaded, setIsDataLoaded] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true); 
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [selectedDate, setSelectedDate] = useState<string>("");
   const [selectedCategory, setSelectedCategory] = useState<string>("");
@@ -139,6 +88,7 @@ const TransactionPage = () => {
       if (currentUser) {
         setIsAuthenticated(true);
         const fetchAndSetTransactions = async () => {
+          setIsLoading(true); 
           try {
             const apiData = await getTransactions();
 
@@ -156,10 +106,14 @@ const TransactionPage = () => {
             setIsDataLoaded(true);
           } catch (error) {
             console.error("Failed to fetch transactions:", error);
+          } finally {
+            setIsLoading(false);
           }
         };
 
         fetchAndSetTransactions();
+      } else {
+        setIsLoading(false);
       }
     });
 
@@ -168,7 +122,6 @@ const TransactionPage = () => {
 
   const uniqueDates = useMemo(() => {
     const dates = new Set(transactions.map((t) => t.date));
-    // Sort dates in descending order (most recent first)
     return Array.from(dates).sort(
       (a, b) => new Date(b).getTime() - new Date(a).getTime()
     );
@@ -193,8 +146,20 @@ const TransactionPage = () => {
     });
   }, [transactions, searchTerm, selectedDate, selectedCategory]);
 
+  const totalAmount = useMemo(() => {
+    return filteredTransactions.reduce((sum, transaction) => sum + transaction.amount, 0);
+  }, [filteredTransactions]);
+
+  if (isLoading && !authenticated) {
+    return <LoadingSpinner message="Checking authentication..." />;
+  }
+
   if (!authenticated) {
     return <p>Please login to view this page</p>;
+  }
+
+  if (isLoading) {
+    return <LoadingSpinner message="Loading transactions..." />;
   }
 
   return (
@@ -210,6 +175,7 @@ const TransactionPage = () => {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           sx={{ flexGrow: 1, minWidth: { xs: "100%", sm: "300px" } }}
+          disabled={isLoading} 
         />
         <div className={styles.DropdownContainer}>
           <FormControl sx={{ minWidth: 100 }}>
@@ -221,6 +187,7 @@ const TransactionPage = () => {
               onChange={(e: SelectChangeEvent<string>) =>
                 setSelectedDate(e.target.value)
               }
+              disabled={isLoading} 
             >
               <MenuItem value="">
                 <em>All Dates</em>
@@ -241,6 +208,7 @@ const TransactionPage = () => {
               onChange={(e: SelectChangeEvent<string>) =>
                 setSelectedCategory(e.target.value)
               }
+              disabled={isLoading}
             >
               <MenuItem value="">
                 <em>All Categories</em>
@@ -255,17 +223,19 @@ const TransactionPage = () => {
         </div>
       </div>
 
-      {!isDataLoaded && <p>Loading transactions...</p>}
-
       {isDataLoaded && filteredTransactions.length === 0 && (
-        <p>No transactions found matching your criteria.</p>
+        <Box textAlign="center" mt={4}>
+          <Typography variant="body1" color="text.secondary">
+            No transactions found matching your criteria.
+          </Typography>
+        </Box>
       )}
 
       {isDataLoaded &&
         filteredTransactions.length > 0 &&
         filteredTransactions.map((transaction) => (
           <TransactionDetail
-            key={transaction.id} // Ensure key is on the outermost element in the map
+            key={transaction.id}
             icon={transaction.icon}
             merchant={transaction.name}
             type={transaction.category}
